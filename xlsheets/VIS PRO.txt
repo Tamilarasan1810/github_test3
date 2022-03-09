@@ -1,0 +1,49 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt 
+import seaborn as sns
+nft = pd.read_csv("NFT_Top_Collections.csv")
+nft.head()
+nft.info()
+nft.drop(columns = ["Category","Website","Logo"],inplace = True)
+nft.dropna(inplace=True)
+nft.info()
+
+nft["Market_Cap_USD"] = nft["Market_Cap_USD"]/nft["Market_Cap_USD"].max()
+nft["Volume_USD"] = nft["Volume_USD"]/nft["Volume_USD"].max()
+fig,ax = plt.subplots(1,5,figsize=(20,15))
+sns.boxplot(y =nft.Volume_USD ,data = nft,ax = ax[0])
+sns.boxplot(y =nft.Market_Cap_USD ,data = nft,ax = ax[1])
+sns.boxplot(y =nft.Sales ,data = nft,ax = ax[2])
+sns.boxplot(y =nft.Floor_Price_USD,data = nft,ax = ax[3])
+sns.boxplot(y =nft.Owner_Asset_Ratio ,data = nft,ax = ax[4])
+plt.grid(True)
+plt.show()
+new_index = nft.Owner_Asset_Ratio.sort_values(ascending = False).index.values
+sorted_nft = nft.reindex(new_index)
+sorted_nft.index = range(0,540)
+top_nft = sorted_nft.loc[0:100]
+top_nft
+plt.subplots(figsize=(50,15))
+sns.barplot(x=top_nft.Name,y=top_nft.Owner_Asset_Ratio.sort_values(),palette = "rocket")
+plt.xticks(rotation = 90)
+plt.xlabel("NFT Project Name",fontsize =30)
+plt.ylabel("NFT Owner-Asset Ratio",fontsize =30)
+plt.title("Top 100 NFT Popularity by Owner-Asset Ratio",fontsize =50)
+plt.show()
+av_price_index = nft.Average_Price_USD.sort_values(ascending = False).index.values
+floor_price_index = nft.Floor_Price_USD.sort_values(ascending = False).index.values
+av_price_data = nft.reindex(av_price_index)
+floor_price_data = nft.reindex(floor_price_index)
+av_price_data.Average_Price_USD = av_price_data.Average_Price_USD/max(av_price_data.Average_Price_USD)
+floor_price_data.Floor_Price_USD = floor_price_data.Floor_Price_USD/max(floor_price_data.Floor_Price_USD)
+av_price_data = av_price_data.reindex(range(0,50))
+floor_price_data = floor_price_data.reindex(range(0,50))
+av_price_data = av_price_data.iloc[0:50]
+floor_price_data = floor_price_data.iloc[0:50]
+plt.subplots(figsize=(30,30))
+sns.pointplot(x = "Name",y="Average_Price_USD",data =av_price_data,color="red" )
+plt.grid(True)
+plt.xticks(rotation = 90)
+plt.legend()
+plt.show()
